@@ -1,0 +1,2 @@
+/#confirmation_token=:token  /admin/#confirmation_token=:token  301!
+/teste  /admin  301!
