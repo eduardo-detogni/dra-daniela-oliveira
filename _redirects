@@ -1,1 +1,1 @@
-/welcome /admin/ 302
+/#confirmation_token=:token  /admin/#confirmation_token=:token  301!
