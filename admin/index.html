@@ -1,11 +1,65 @@
 <!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Content Manager</title>
-  </head>
-  <body>
-    <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Administração</title>
+  <script src="https://cdn.auth0.com/js/auth0-spa-js/1.19/auth0-spa-js.production.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container py-5">
+    <h2 class="text-center">Área de Administração</h2>
+    <p class="text-center">Aguarde... verificando acesso.</p>
+  </div>
+
+  <script>
+    const auth0Config = {
+      domain: "SEU-DOMINIO.auth0.com",      // substitua
+      clientId: "SEU-CLIENT-ID",            // substitua
+      redirectUri: window.location.origin + "/admin"
+    };
+
+    let auth0Client;
+
+    (async () => {
+      auth0Client = await createAuth0Client({
+        domain: auth0Config.domain,
+        client_id: auth0Config.clientId,
+        redirect_uri: auth0Config.redirectUri
+      });
+
+      // Trata retorno do login
+      if (window.location.search.includes("code=") && window.location.search.includes("state=")) {
+        await auth0Client.handleRedirectCallback();
+        window.history.replaceState({}, document.title, "/admin");
+      }
+
+      const isAuthenticated = await auth0Client.isAuthenticated();
+
+      if (!isAuthenticated) {
+        // Redireciona para login
+        await auth0Client.loginWithRedirect();
+      } else {
+        // Usuário autenticado → exibe conteúdo do painel
+        document.body.innerHTML = `
+          <div class="container py-5">
+            <h2 class="text-center">Bem-vinda, Dra.</h2>
+            <p class="text-center">Você está autenticada. Aqui é onde você publicará seus textos.</p>
+            <div class="text-center mt-4">
+              <button class="btn btn-outline-danger" onclick="logout()">Sair</button>
+            </div>
+          </div>
+        `;
+      }
+    })();
+
+    function logout() {
+      auth0Client.logout({
+        returnTo: window.location.origin
+      });
+    }
+  </script>
+</body>
 </html>
 
